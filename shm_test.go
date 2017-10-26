@@ -1,4 +1,4 @@
-package shm
+package shm_test
 
 import (
 	"io"
@@ -6,18 +6,40 @@ import (
 	"strings"
 	"sync"
 	"testing"
+
+	"github.com/hidez8891/shm"
 )
+
+func create(t *testing.T, tag string, size int32) *shm.Memory {
+	t.Helper()
+
+	m, err := shm.Create(tag, size)
+	if err != nil {
+		t.Fatalf("fail: create shared memroy %v", err)
+	}
+	return m
+}
+
+func open(t *testing.T, tag string, size int32) *shm.Memory {
+	t.Helper()
+
+	m, err := shm.Open(tag, size)
+	if err != nil {
+		t.Fatalf("fail: open shared memroy %v", err)
+	}
+	return m
+}
 
 func TestNewOpen(t *testing.T) {
 	// create shared memory
-	w, err := Create("test_t", 64)
+	w, err := shm.Create("test_t", 64)
 	if err != nil {
 		t.Fatalf("fail: create shared memroy %v", err)
 	}
 	defer w.Close()
 
 	// open shared memory
-	r, err := Open("test_t", 64)
+	r, err := shm.Open("test_t", 64)
 	if err != nil {
 		t.Fatalf("fail: open shared memroy %v", err)
 	}
@@ -36,17 +58,11 @@ func TestReadWriteAt(t *testing.T) {
 	}
 
 	// create shared memory
-	w, err := Create("test_t", 64)
-	if err != nil {
-		t.Fatalf("fail: create shared memroy %v", err)
-	}
+	w := create(t, "test_t", 64)
 	defer w.Close()
 
 	// open shared memory
-	r, err := Open("test_t", 64)
-	if err != nil {
-		t.Fatalf("fail: open shared memroy %v", err)
-	}
+	r := open(t, "test_t", 64)
 	defer r.Close()
 
 	// read/write test
@@ -86,17 +102,11 @@ func TestReadWriteAt_OverPosition(t *testing.T) {
 	}
 
 	// create shared memory
-	w, err := Create("test_t", 64)
-	if err != nil {
-		t.Fatalf("fail: create shared memroy %v", err)
-	}
+	w := create(t, "test_t", 64)
 	defer w.Close()
 
 	// open shared memory
-	r, err := Open("test_t", 64)
-	if err != nil {
-		t.Fatalf("fail: open shared memroy %v", err)
-	}
+	r := open(t, "test_t", 64)
 	defer r.Close()
 
 	// write dummy
@@ -164,17 +174,11 @@ func TestReadWriteAt_MultiThreads(t *testing.T) {
 	}
 
 	// create shared memory
-	w, err := Create("test_t", 64)
-	if err != nil {
-		t.Fatalf("fail: create shared memroy %v", err)
-	}
+	w := create(t, "test_t", 64)
 	defer w.Close()
 
 	// open shared memory
-	r, err := Open("test_t", 64)
-	if err != nil {
-		t.Fatalf("fail: open shared memroy %v", err)
-	}
+	r := open(t, "test_t", 64)
 	defer r.Close()
 
 	wg := new(sync.WaitGroup)
@@ -252,17 +256,11 @@ func TestReadWrite(t *testing.T) {
 	}
 
 	// create shared memory
-	w, err := Create("test_t", 64)
-	if err != nil {
-		t.Fatalf("fail: create shared memroy %v", err)
-	}
+	w := create(t, "test_t", 64)
 	defer w.Close()
 
 	// open shared memory
-	r, err := Open("test_t", 64)
-	if err != nil {
-		t.Fatalf("fail: open shared memroy %v", err)
-	}
+	r := open(t, "test_t", 64)
 	defer r.Close()
 
 	// read/write test
@@ -318,17 +316,11 @@ func TestReadWrite_MultiThreads(t *testing.T) {
 	}
 
 	// create shared memory
-	w, err := Create("test_t", 64)
-	if err != nil {
-		t.Fatalf("fail: create shared memroy %v", err)
-	}
+	w := create(t, "test_t", 64)
 	defer w.Close()
 
 	// open shared memory
-	r, err := Open("test_t", 64)
-	if err != nil {
-		t.Fatalf("fail: open shared memroy %v", err)
-	}
+	r := open(t, "test_t", 64)
 	defer r.Close()
 
 	wg := new(sync.WaitGroup)
