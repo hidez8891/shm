@@ -26,7 +26,7 @@ func create(name string, size int32) (*shmi, error) {
 		return nil, os.NewSyscallError("CreateFileMapping", err)
 	}
 
-	v, err := syscall.MapViewOfFile(h, syscall.FILE_MAP_WRITE, 0, 0, uintptr(size))
+	v, err := syscall.MapViewOfFile(h, syscall.FILE_MAP_WRITE, 0, 0, 0)
 	if err != nil {
 		syscall.CloseHandle(h)
 		return nil, os.NewSyscallError("MapViewOfFile", err)
