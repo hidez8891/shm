@@ -31,24 +31,26 @@ func open(t *testing.T, tag string, size int32) *shm.Memory {
 }
 
 func TestNewOpen(t *testing.T) {
-	for d := uint(1); d <= 30; d++ {
-		size := int32(1) << d
+	for d := uint(1); d <= 8; d++ {
+		size := int32(8192) << d
 
 		// create shared memory
 		w, err := shm.Create("test_t", size)
 		if err != nil {
-			t.Logf("warn: fail create %d byte shared memroy %v", size, err)
+			t.Errorf("warn: fail create %d byte shared memroy %v", size, err)
 			continue
 		}
-		defer w.Close()
+
 
 		// open shared memory
 		r, err := shm.Open("test_t", size)
 		if err != nil {
-			t.Logf("warn: fail open %d byte shared memroy %v", size, err)
+			t.Errorf("warn: fail open %d byte shared memroy %v", size, err)
+			w.Close()
 			continue
 		}
-		defer r.Close()
+		r.Close()
+		w.Close()
 	}
 }
 
