@@ -9,19 +9,26 @@ package shm
 #include <fcntl.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/errno.h>
 
 int _create(const char* name, int size, int flag) {
 	mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
 	int fd = shm_open(name, flag, mode);
 	if (fd < 0) {
+		//fprintf(stderr,"shm_open fd=%d,error=%d,size=%d\n",fd,errno,size);
 		return -1;
 	}
 	struct stat mapstat;
-	if (-1 != fstat(fd, &mapstat) && mapstat.st_size == 0) {
+	int ret= fstat(fd, &mapstat);
+	if (-1 != ret && mapstat.st_size == 0) {
 		if (ftruncate(fd, size) != 0) {
-		close(fd);
-		return -2;
+			close(fd);
+			return -2;
 		}
+	} else if (ret==-1) {
+		//fprintf(stderr,"state error=%d,size=%d\n",errno,size);
+		close(fd);
+		return -3;
 	}
 	return fd;
 }
