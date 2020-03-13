@@ -37,18 +37,20 @@ func TestNewOpen(t *testing.T) {
 		// create shared memory
 		w, err := shm.Create("test_t", size)
 		if err != nil {
-			t.Logf("warn: fail create %d byte shared memroy %v", size, err)
+			t.Errorf("warn: fail create %d byte shared memroy %v", size, err)
 			continue
 		}
-		defer w.Close()
 
 		// open shared memory
 		r, err := shm.Open("test_t", size)
 		if err != nil {
-			t.Logf("warn: fail open %d byte shared memroy %v", size, err)
+			w.Close()
+			t.Errorf("warn: fail open %d byte shared memroy %v", size, err)
 			continue
 		}
-		defer r.Close()
+
+		w.Close()
+		r.Close()
 	}
 }
 
