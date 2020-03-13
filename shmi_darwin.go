@@ -13,23 +13,24 @@ package shm
 
 int _create(const char* name, int size, int flag) {
 	mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP;
+
 	int fd = shm_open(name, flag, mode);
 	if (fd < 0) {
-		//fprintf(stderr,"shm_open fd=%d,error=%d,size=%d\n",fd,errno,size);
 		return -1;
 	}
+
 	struct stat mapstat;
-	int ret= fstat(fd, &mapstat);
-	if (-1 != ret && mapstat.st_size == 0) {
+	int ret = fstat(fd, &mapstat);
+	if (ret != -1 && mapstat.st_size == 0) {
 		if (ftruncate(fd, size) != 0) {
 			close(fd);
 			return -2;
 		}
-	} else if (ret==-1) {
-		//fprintf(stderr,"state error=%d,size=%d\n",errno,size);
+	} else if (ret == -1) {
 		close(fd);
 		return -3;
 	}
+
 	return fd;
 }
 
@@ -84,7 +85,7 @@ type shmi struct {
 }
 
 // create shared memory. return shmi object.
-//name should not be more than 31 bytes
+// name should not be more than 31 bytes.
 func create(name string, size int32) (*shmi, error) {
 	name = "/" + name
 
@@ -103,7 +104,7 @@ func create(name string, size int32) (*shmi, error) {
 }
 
 // open shared memory. return shmi object.
-//name should not be more than 31 bytes
+// name should not be more than 31 bytes.
 func open(name string, size int32) (*shmi, error) {
 	name = "/" + name
 
