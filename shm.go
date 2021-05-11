@@ -31,11 +31,15 @@ func Open(name string, size int32) (*Memory, error) {
 
 // Close is close & discard shared memory
 func (o *Memory) Close() (err error) {
+	fmt.Println("NEW CLOSE METHOD")
+	// This code makes sure not to crash if the object pointer is nil - which can happen.
+	if o == nil {
+		return nil
+	}
 	if o.m != nil {
+		// Refactor for simplicity.
 		err = o.m.close()
-		if err == nil {
-			o.m = nil
-		}
+		o.m = nil
 	}
 	return err
 }
